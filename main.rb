@@ -10,10 +10,9 @@ url = gets.sub("\n","")
 p url
 p "put the path"
 path = gets.sub("\n","")
-if File.exist?(path)
-  raise "path exists"
+if !File.exist?(path)
+  FileUtils.mkdir_p(path)
 end
-FileUtils.mkdir_p(path)
 
 
 url_str = URI.parse(url)
@@ -39,14 +38,30 @@ when /showcollect/
 else
   raise "无效的地址"
 end
-p list
-list.each do |song_url|
+list_count = list.length
+list.each_with_index do |song_url,index|
   m3l = Xiami::Mp3Location.create(song_url)
   mp3_url = m3l.mp3_url
   song_name = m3l.song_name
   album_name = m3l.album_name
   artist_name = m3l.artist_name
-  p mp3_url
-  `wget -O "#{path}/#{song_name}--#{album_name}(#{artist_name}).mp3" "#{mp3_url}"`
+
+  mp3 = "#{path}/#{song_name}--#{album_name}(#{artist_name}).mp3"
+
+  p "下载第#{index+1}首，共#{list_count}首"
+  next if File.exist?(mp3)
+
+  retry_count = 5
+  begin
+    `wget -O "#{mp3}" "#{mp3_url}"`
+  rescue Exception => ex
+    if retry_count < 0
+      raise "下载第#{index+1}首超时"
+    else
+      retry_count -= 1
+      retry
+    end
+  end
+
   sleep(rand(5))
 end

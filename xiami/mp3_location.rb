@@ -1,5 +1,4 @@
 require "cgi"
-require "json"
 module Xiami
 
   class Mp3Location
@@ -15,18 +14,7 @@ module Xiami
     end
 
     private
-    def parse
-      p "parse"
-      json_src = "http://www.xiami.com/widget/json-single/uid/0/sid/#{@song_id}"
-      url_str = URI.parse(json_src)
-      site = Net::HTTP.new(url_str.host, url_str.port)
-      json_str = site.get2(url_str.path,{'accept'=>'text/html'}).body
-      location = JSON(json_str)["location"]
-      @mp3_url = sospa(location)
-    end
-
     def parse_info
-      p "parse_info"
       info_src = "http://www.xiami.com/widget/xml-single/uid/0/sid/#{@song_id}"
       url_str = URI.parse(info_src)
       site = Net::HTTP.new(url_str.host, url_str.port)
