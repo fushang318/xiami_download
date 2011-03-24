@@ -5,10 +5,10 @@ require "xiami/mp3_location"
 require 'fileutils'
 
 
-p "put the url:"
+p "put the xiami url:"
 url = gets.sub("\n","")
 p url
-p "put the path"
+p "put the save dir:"
 path = gets.sub("\n","")
 if !File.exist?(path)
   FileUtils.mkdir_p(path)
@@ -36,7 +36,7 @@ when /showcollect/
     list << url
   end
 else
-  raise "无效的地址"
+  raise "Invalid Url"
 end
 list_count = list.length
 list.each_with_index do |song_url,index|
@@ -48,7 +48,7 @@ list.each_with_index do |song_url,index|
 
   mp3 = "#{path}/#{song_name}--#{album_name}(#{artist_name}).mp3"
 
-  p "下载第#{index+1}首，共#{list_count}首"
+  p "download the #{index+1} song, total #{list_count}"
   next if File.exist?(mp3)
 
   retry_count = 5
@@ -56,7 +56,7 @@ list.each_with_index do |song_url,index|
     `wget -O "#{mp3}" "#{mp3_url}"`
   rescue Exception => ex
     if retry_count < 0
-      raise "下载第#{index+1}首超时"
+      raise "download the #{index+1} song error"
     else
       retry_count -= 1
       retry
