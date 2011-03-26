@@ -35,6 +35,11 @@ when /showcollect/
     url = as.first["href"]
     list << url
   end
+when /artist/
+  doc.css("table.track_list td.song_name").each do |td|
+    url = td.css("a").first["href"]
+    list << url
+  end
 else
   raise "Invalid Url"
 end
